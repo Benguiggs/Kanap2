@@ -1,6 +1,13 @@
 // Récupération des données depuis l'API et ajout des éléments liés au Local Storage vers la page Panier
+const cart = getItemsFromStorage();
+function getItemsFromStorage() {
 
-const cart = []
+    const datasFromStorage = localStorage.getItem("datas");
+
+    return datasFromStorage !== null
+        ? JSON.parse(datasFromStorage)
+        : [];
+}
 
 fetchItemsFromCache()
 cart.forEach((item) => displayItem(item))
@@ -8,21 +15,27 @@ cart.forEach((item) => displayItem(item))
 const submitButton = document.querySelector("#order")
 submitButton.addEventListener("click", (e) => submitForm(e))
 
+function mergeApiDataAndStorageData(apiData) {
+
+    const foundProductIndex = cart.findIndex((cartProduct) => cartProduct.id === apiData._id);
+
+    cart[foundProductIndex] = { ...apiData, ...cart[foundProductIndex] };
+    delete cart[foundProductIndex]._id
+    return cart[foundProductIndex];
+}
 
 function fetchItemsFromCache() {
-    const numberOfItems = localStorage.length
-    //il faut chercher les produit de l'api avec fetch 
-    fetch(`http://localhost:3000/api/products/${id}`)
-        .then((response) => response.json())
-        .then((res) => displayProduct(res))
-
-    for (let i = 0; i < numberOfItems; i++) {
-        // localStorage[i].id 
+    for (let i = 0; i < cart.length; i++) {
+        const itemId = cart[i].id;
         // il faut chercher ( find )le produit qui correpond a l'id de produit dans localStorage pour avoir les autres info ( price , image , name )
-        const item = localStorage.getItem(localStorage.key(i)) || ""
-        const itemObject = JSON.parse(item)
-        cart.push(itemObject)
+        fetch(`http://localhost:3000/api/products/${itemId}`)
+            .then((response) => response.json())
+            .then((apiProduct) => {
+                const mergedProductFromApiAndStorage = mergeApiDataAndStorageData(apiProduct);
+                displayItem(mergedProductFromApiAndStorage);
+            });
     }
+
 }
 
 // Affichage des produits
@@ -78,7 +91,6 @@ function addDeleteToSettings(settings, item) {
     const div = document.createElement("div")
     div.classList.add("cart__item__content__settings__delete")
     div.addEventListener("click", () => deleteItem(item))
-
 
     const p = document.createElement("p")
     p.textContent = "Supprimer"

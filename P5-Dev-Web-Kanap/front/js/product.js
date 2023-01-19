@@ -11,7 +11,7 @@ function getIdFromUrl() {
 
     // return id!=null?id:false;
 }
-/*fetch(`http://localhost:3000/api/products/${id}`)
+/*fetch(`http://localhost:3000/api/products/${_id}`)
     .then((response) => response.json())
     .then((res) => displayProduct(res))
 */
@@ -44,6 +44,7 @@ function displayProduct(product) {
     createCartContent(description)
     createColors(colors)
 }
+
 // Affiche l'image du produit
 function createImage(imageUrl, altTxt) {
     const image = document.createElement('img')
@@ -52,6 +53,7 @@ function createImage(imageUrl, altTxt) {
     const parent = document.querySelector(".item__img")
     if (parent != null) parent.appendChild(image)
 }
+
 // Affiche le titre du produit
 function createTitle(name) {
     const h1 = document.querySelector("#title")
@@ -79,7 +81,6 @@ function createColors(colors) {
         })
     }
 }
-
 
 // Sauvegarde le choix des articles au panier
 function saveOrder(color, quantity) {
@@ -151,12 +152,12 @@ function main() {
     getDataFromBackend(url,id);
     addEventForButton();
 }
-
+// Fonction d'ajout d'article au panier
 main();
 function addEventForButton() {
     const button = document.querySelector("#addToCart");
     button.addEventListener("click", addToBasket);
-    // Ajout des couleurs et des quantités aux articles
+   
 
 }
 

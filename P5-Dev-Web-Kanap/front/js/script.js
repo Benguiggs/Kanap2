@@ -14,19 +14,14 @@ function main() {
     let url = "http://localhost:3000/api/products";
     getDatasFromBackend(url);
 }
-
 main();
-
 //Affiche tous les produits
 function showProducts(datas) {
     if (datas === null || datas === []) {
-        //todo prévenir l'utilisateur
         document.getElementById().innerHTML = error.message
         return;
     }
-
     datas.forEach((data) => {
-
         showData(data);
     })
 }
