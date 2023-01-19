@@ -1,3 +1,8 @@
+main();
+
+//TODO implémenter les fonctions showAlertError..
+//TODO Supprimer le code mort
+
 // Récupération des données avec la méthode fetch
 function getDatasFromBackend(urlBackend) {
     fetch(urlBackend)
@@ -5,6 +10,8 @@ function getDatasFromBackend(urlBackend) {
         .then((datas) => showProducts(datas))
         .catch((e) => {
             console.log(e)
+
+            //TODO showAlertError
             document.getElementById().innerHTML = error.message
         })
 }
@@ -14,7 +21,7 @@ function main() {
     let url = "http://localhost:3000/api/products";
     getDatasFromBackend(url);
 }
-main();
+
 //Affiche tous les produits
 function showProducts(datas) {
     if (datas === null || datas === []) {
@@ -48,18 +55,7 @@ function appendElementsToArticle(article, array) {
 
 }
 
-function test() {
-    //déclaration
 
-    //initialisation
-
-    //contrôle
-
-    //traitement
-
-    //valeur de retour
-
-}
 // Fonction qui permet de faire le lien avec la page product
 function createAttach(id) {
     const attach = document.createElement("a")

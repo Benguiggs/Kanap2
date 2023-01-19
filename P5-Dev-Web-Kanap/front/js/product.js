@@ -1,3 +1,5 @@
+main();
+
 // Récupere l'id depuis l'url
 function getIdFromUrl() {
     const queryString = window.location.search;
@@ -9,21 +11,20 @@ function getIdFromUrl() {
         return false;
     }
 
-    // return id!=null?id:false;
 }
-/*fetch(`http://localhost:3000/api/products/${_id}`)
-    .then((response) => response.json())
-    .then((res) => displayProduct(res))
-*/
 
+// Récupération des données depuis le Backend
 function getDataFromBackend(url, id) {
-fetch(url +  id)
-    .then((response) => response.json())
-    .then((response) => displayProduct(response))
-    .catch((e) => {
-        console.log(e)
-        document.getElementById().innerHTML = error.message
-    })
+    fetch(url + id)
+        .then((response) => response.json())
+        .then((response) => displayProduct(response))
+        .catch((e) => {
+            console.log(e)
+            //TODO masquer le zone de détail du produit
+            showAlertError('Produit non trouvé');
+
+            document.getElementById().innerHTML = error.message
+        })
 }
 // Affiche tous les produits
 function displayProduct(product) {
@@ -89,97 +90,110 @@ function saveOrder(color, quantity) {
         color: color,
         quantity: Number(quantity),
     }
-    
+
     let datas = getDatasFromLocalStorage();
     console.log(datas);
-    if (datas.length==0) {
+    if (datas.length == 0) {
         datas.push(data);
-        localStorage.setItem("datas", JSON.stringify(datas));
-    } 
-    else {
-
-        // si l'id et la couleur sont dans le localstorage dans ce cas, on cumul les quantités (attention à la restriction des 100)
-
-        //sinon datas.push()
-        datas.push(data);
-        localStorage.setItem("datas", JSON.stringify(datas));
     }
+    else {
+        let productFind=false ;
+        // si l'id et la couleur sont dans le localstorage dans ce cas, on cumul les quantités (attention à la restriction des 100)
+        datas.forEach( datals => {
+            if (datals.id== data.id && datals.color == data.color) {
+                productFind=true;
+                datals.quantity=datals.quantity + data.quantity;
+                datals.quantity= datals.quantity>100?100:datals.quantity;
+            }
+        } )
+        //sinon datas.push()
+        if (!productFind) {
+            datas.push(data);
+        }
+    }
+    localStorage.setItem("datas", JSON.stringify(datas));
+    showAlertSucces("Votre produit a été mis dans le panier")
 }
-//todo function getLs datas->[]
+// Récupération des données via le Local Storage
 function getDatasFromLocalStorage() {
-    let datas=localStorage.getItem('datas');
-    return datas==null?[] : JSON.parse( datas);
+    let datas = localStorage.getItem('datas');
+    return datas == null ? [] : JSON.parse(datas);
 }
 
 
 
 
-    //si présent, tu modifies que la quantité (cumul de la quantité précédente et courante) en vérifiant que ce soit <100
-    //sinon push
-
-  //  localStorage.setItem("datas", JSON.stringify(datas))
-  function addToBasket() {
+// Fonction d'ajout au Panier
+function addToBasket() {
     const color = document.querySelector("#colors").value
     const quantity = document.querySelector("#quantity").value
 
     if (isOrdernotvalid(color, quantity)) return
     saveOrder(color, quantity)
-    //redirectToCart()
+    
 }
 
 // Fonction qui indique a l'utilisateur de choisir un article ainsi que sa couleur
 function isOrdernotvalid(color, quantity) {
-    if (color == null || color === "" || quantity == null || quantity == 0|| quantity > 100) {
-        alert("Choisissez une couleur et un nombre d'article(s) s'il-vous plaît")
+    if (color == null || color === "" || quantity == null || quantity == 0 || quantity > 100) {
+        showAlertError("Choisissez une couleur et un nombre d'article(s) s'il-vous plaît")
         return true
     }
 }
-// Redirige l'utilisateur vers la page cart.html
-function redirectToCart() {
-    window.location.href = "cart.html"
-}
+
 
 function main() {
     let url = "http://localhost:3000/api/products/";
     let id = getIdFromUrl();
 
     if (id == false) {
-        //todo message à l'utilisateur
-        //document.getElementById().innerHTML = error.message
         showAlertError("L'adresse est incorrecte");
         return;
     }
-    getDataFromBackend(url,id);
+
+    getDataFromBackend(url, id);
     addEventForButton();
 }
-// Fonction d'ajout d'article au panier
-main();
+
+
+// Quand on clique sur un article, cela l'ajoute au panier
 function addEventForButton() {
     const button = document.querySelector("#addToCart");
     button.addEventListener("click", addToBasket);
-   
-
 }
 
+// Fonction permettant de prévenir l'utilisateur d'un message d'alerte
 function showAlert(message, bgColor, color) {
 
-    const balises=document.getElementsByClassName('item');
-    let divMsg=document.getElementById("message");
-    if( divMsg === null) {
-        divMsg=document.createElement('div');
-        divMsg.id="message";
+    const balises = document.getElementsByClassName('item');
+    let divMsg = document.getElementById("message");
+    if (divMsg === null) {
+        divMsg = document.createElement('div');
+        divMsg.id = "message";
     }
-    divMsg.style.color=color;
-    divMsg.style.background=bgColor ;
-    
-    divMsg.textContent=message;
+    divMsg.style.display="block";
+    divMsg.style.color = color;
+    divMsg.style.background = bgColor;
+    divMsg.style.padding="20px";
+    divMsg.style.position="fixed";
+    divMsg.style.top="50px";
+    divMsg.style.left="50px";
+    divMsg.style.zIndex="9999";
+    divMsg.style.borderRadius="20px";
+
+    divMsg.textContent = message;
     balises[0].appendChild(divMsg);
-    //settimeout
+    // Fonction permettant d'afficher l'alerte au bout d'une seconde
+    setTimeout(() => {
+        divMsg.style.display="none";
+    }, 1500)
 }
 
-function showAlertError(message){
-    showAlert(message,'#f0a0a0', 'red');
+// Prévient l'utilisateur d'une alerte avec un message d'erreur indiquant une couleur rouge
+function showAlertError(message) {
+    showAlert(message, '#f44336', 'white');
 }
-function showAlertSucces(message){
-    showAlert(message,'#bbf0a0', 'green');
+// Prévient l'utilisateur d'une alerte avec un message de succés indiquant une couleur verte
+function showAlertSucces(message) {
+    showAlert(message, '#5cb811', 'white');
 }

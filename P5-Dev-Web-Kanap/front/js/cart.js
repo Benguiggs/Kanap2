@@ -1,12 +1,39 @@
+
 // Récupération des données depuis l'API et ajout des éléments liés au Local Storage vers la page Panier
-const cart = getItemsFromStorage();
-function getItemsFromStorage() {
+let cart;
+let catalogue;
 
-    const datasFromStorage = localStorage.getItem("datas");
+// Fonction principale qui va vérifier s'il y a des données dans le Local Storage, si non elle va masquer le formulaire et prévenir l'utilisateur que le panier est vide
+function main() {
+    cart== getDatasFromLocalStorage();
+    if (cart==[]) {
+        //TODO fonction qui masque le formulaire
+        //TODO prévenir l'utilisateur que le panier est vide
+        return;
+    }
+    let url = "http://localhost:3000/api/products";
+    getDatasFromBackend(url);
+}
 
-    return datasFromStorage !== null
-        ? JSON.parse(datasFromStorage)
-        : [];
+// Récupération des données avec la méthode fetch => solution 2
+function getDatasFromBackend(urlBackend) {
+    fetch(urlBackend)
+        .then((res) => res.json())
+        .then((datas) => {
+            catalogue=datas;
+            //TODO
+            showCart();
+        })
+        .catch((e) => {
+            console.log(e)
+            document.getElementById().innerHTML = error.message
+        })
+}
+
+// Récupération des données via le Local Storage
+function getDatasFromLocalStorage() {
+    let datas = localStorage.getItem('datas');
+    return datas == null ? [] : JSON.parse(datas);
 }
 
 fetchItemsFromCache()
@@ -35,7 +62,6 @@ function fetchItemsFromCache() {
                 displayItem(mergedProductFromApiAndStorage);
             });
     }
-
 }
 
 // Affichage des produits
@@ -50,7 +76,7 @@ function displayItem(item) {
     displayTotalQuantity()
     displayTotalPrice()
 }
-// affiche la quantité totale des produits
+// Affiche la quantité totale des produits
 function displayTotalQuantity() {
     const totalQuantity = document.querySelector("#totalQuantity")
     const total = cart.reduce((total, item) => total + item.quantity, 0)
@@ -263,7 +289,6 @@ function createReqBody() {
             address: address,
             city: city,
             email: email
-
         },
         products: getIdCache()
     }
@@ -279,5 +304,18 @@ function getIdCache() {
         ids.push(id)
     }
     return ids
+}
+
+function test() {
+    //déclaration
+
+    //initialisation
+
+    //contrôle
+
+    //traitement
+
+    //valeur de retour
+
 }
 
