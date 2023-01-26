@@ -1,7 +1,7 @@
 main();
 
 //TODO implémenter les fonctions showAlertError..
-//TODO Supprimer le code mort
+
 
 // Récupération des données avec la méthode fetch
 function getDatasFromBackend(urlBackend) {
@@ -10,8 +10,7 @@ function getDatasFromBackend(urlBackend) {
         .then((datas) => showProducts(datas))
         .catch((e) => {
             console.log(e)
-
-            //TODO showAlertError
+            (showAlertError)
             document.getElementById().innerHTML = error.message
         })
 }
@@ -49,10 +48,6 @@ function appendElementsToArticle(article, array) {
     array.forEach((item) => {
         article.appendChild(item)
     })
-    //article.appendChild(image)
-    //article.appendChild(h3)
-    //article.appendChild(p)
-
 }
 
 
@@ -70,6 +65,7 @@ function appendArticletoAttach(attach, article) {
         attach.appendChild(article)
     }
 }
+
 // Affiche l'image du produit
 function createImage(imageUrl, altTxt) {
     const image = document.createElement("img")
@@ -77,6 +73,7 @@ function createImage(imageUrl, altTxt) {
     image.alt = altTxt
     return image
 }
+
 // Affiche le titre du produit
 function createH3(name) {
     const h3 = document.createElement("h3")
@@ -88,5 +85,14 @@ function createParagraph(description) {
     const p = document.createElement("p")
     p.textContent = description
     return p
+}
+
+// Prévient l'utilisateur d'une alerte avec un message d'erreur indiquant une couleur rouge
+function showAlertError(message) {
+    showAlert(message, '#f44336', 'white');
+}
+// Prévient l'utilisateur d'une alerte avec un message de succés indiquant une couleur verte
+function showAlertSucces(message) {
+    showAlert(message, '#5cb811', 'white');
 }
 

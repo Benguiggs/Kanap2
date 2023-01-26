@@ -90,7 +90,7 @@ function saveOrder(color, quantity) {
         color: color,
         quantity: Number(quantity),
     }
-
+// Récupere les données en provenance du local storage
     let datas = getDatasFromLocalStorage();
     console.log(datas);
     if (datas.length == 0) {
@@ -98,7 +98,7 @@ function saveOrder(color, quantity) {
     }
     else {
         let productFind=false ;
-        // si l'id et la couleur sont dans le localstorage dans ce cas, on cumul les quantités (attention à la restriction des 100)
+        // si l'id et la couleur sont dans le localstorage dans ce cas, on cumul les quantités
         datas.forEach( datals => {
             if (datals.id== data.id && datals.color == data.color) {
                 productFind=true;

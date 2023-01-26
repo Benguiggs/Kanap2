@@ -1,18 +1,46 @@
+//TODO implémenter les fonctions showAlertError.
+function test() {
+    //déclaration
 
+    //initialisation
+
+    //contrôle
+
+    //traitement
+
+    //valeur de retour
+
+
+    
+}
 // Récupération des données depuis l'API et ajout des éléments liés au Local Storage vers la page Panier
-let cart;
-let catalogue;
+let cartDatas;
+let catalogueDatas;
 
-// Fonction principale qui va vérifier s'il y a des données dans le Local Storage, si non elle va masquer le formulaire et prévenir l'utilisateur que le panier est vide
+// Fonction principale qui va vérifier s'il y a des données dans le Local Storage
 function main() {
-    cart== getDatasFromLocalStorage();
-    if (cart==[]) {
-        //TODO fonction qui masque le formulaire
-        //TODO prévenir l'utilisateur que le panier est vide
+    
+    cartDatas = getDatasFromLocalStorage();
+    if (cartDatas.length === 0) {
+        hideForm();
+        showEmptyCart();
         return;
     }
     let url = "http://localhost:3000/api/products";
     getDatasFromBackend(url);
+}
+main();
+
+// Fonction pour masquer le formulaire si le panier est vide
+function hideForm() {
+    const form = document.querySelector("form");
+    form.style.display = "none";
+}
+
+// Fonction pour afficher un message d'avertissement lorsque le panier est vide
+function showEmptyCart() {
+    console.log(showEmptyCart);
+    showAlertError("Votre panier est vide. Veuillez sélectionner des produits pour continuer.");
 }
 
 // Récupération des données avec la méthode fetch => solution 2
@@ -20,15 +48,29 @@ function getDatasFromBackend(urlBackend) {
     fetch(urlBackend)
         .then((res) => res.json())
         .then((datas) => {
-            catalogue=datas;
-            //TODO
+            catalogueDatas = datas;
             showCart();
         })
         .catch((e) => {
-            console.log(e)
-            document.getElementById().innerHTML = error.message
+            console.log(e);
+            showAlertError(e.message);
         })
 }
+
+function showCart() {
+    cartDatas.forEach((item) => displayItem(item));
+    //displayTotalQuantity()
+    //displayTotalPrice()
+}
+function getItemFromCatalogue(id) {
+    let i=0;
+    for(i=0; i< catalogueDatas.length;i++) {
+        if (catalogueDatas[i]._id === id) {
+            return catalogueDatas[i];
+        }
+    }
+}
+
 
 // Récupération des données via le Local Storage
 function getDatasFromLocalStorage() {
@@ -36,82 +78,82 @@ function getDatasFromLocalStorage() {
     return datas == null ? [] : JSON.parse(datas);
 }
 
+/*
 fetchItemsFromCache()
-cart.forEach((item) => displayItem(item))
-
 const submitButton = document.querySelector("#order")
 submitButton.addEventListener("click", (e) => submitForm(e))
+*/
 
-function mergeApiDataAndStorageData(apiData) {
-
-    const foundProductIndex = cart.findIndex((cartProduct) => cartProduct.id === apiData._id);
-
-    cart[foundProductIndex] = { ...apiData, ...cart[foundProductIndex] };
-    delete cart[foundProductIndex]._id
-    return cart[foundProductIndex];
-}
-
+// Cette fonction récupère les articles du cache
 function fetchItemsFromCache() {
-    for (let i = 0; i < cart.length; i++) {
-        const itemId = cart[i].id;
-        // il faut chercher ( find )le produit qui correpond a l'id de produit dans localStorage pour avoir les autres info ( price , image , name )
-        fetch(`http://localhost:3000/api/products/${itemId}`)
-            .then((response) => response.json())
-            .then((apiProduct) => {
-                const mergedProductFromApiAndStorage = mergeApiDataAndStorageData(apiProduct);
-                displayItem(mergedProductFromApiAndStorage);
+    console.log(fetchItemsFromCache);
+    // Pour chaque article dans le panier
+    for (let i = 0; i < carDatast.length; i++) {
+        // Faire une demande pour récupérer les données de l'API pour l'article actuel
+        fetch(`http://localhost:3000/api/products/${cart[i].id}`)
+            .then(response => response.json())
+            .then(apiProduct => {  
+                // Afficher l'article
+                displayItem();
             });
     }
 }
 
 // Affichage des produits
 function displayItem(item) {
-    const article = createArticle(item)
-    const imageDiv = createImgDiv(item)
+    let itemCatalogue= getItemFromCatalogue(item.id);
+    const article = createArticle(item,itemCatalogue)
+    const imageDiv = createImgDiv(itemCatalogue)
     article.appendChild(imageDiv)
 
-    const cardItemContent = createCartContent(item)
+    const cardItemContent = createCartContent(item,itemCatalogue)
     article.appendChild(cardItemContent)
     displayArticle(article)
-    displayTotalQuantity()
-    displayTotalPrice()
+
 }
+
 // Affiche la quantité totale des produits
 function displayTotalQuantity() {
     const totalQuantity = document.querySelector("#totalQuantity")
-    const total = cart.reduce((total, item) => total + item.quantity, 0)
+    const total = cartDatas.reduce((total, item) => total + item.quantity, 0)
     totalQuantity.textContent = total
 }
+
 // Affiche le prix total
 function displayTotalPrice() {
     let total = 0
     const totalPrice = document.querySelector("#totalPrice")
-    cart.forEach((item) => {
+    /*
+    cartDatas.forEach((item) => {
         const totalUnitPrice = item.price * item.quantity
         total += totalUnitPrice
         totalPrice.textContent = total
     })
+    */
 }
 
-function createCartContent(item) {
+// Crée le contenu pour un élément dans le panier 
+function createCartContent(item,itemCatalogue) {
     const cardItemContent = document.createElement("div")
     cardItemContent.classList.add("cart__item__content")
-    const description = createDescription(item)
-    const settings = createSettings(item)
+    const description = createDescription(item,itemCatalogue)
+    const settings = createSettings(item, itemCatalogue)
 
     cardItemContent.appendChild(description)
     cardItemContent.appendChild(settings)
     return cardItemContent
 }
 
-function createSettings(item) {
+// Crée les paramètres d'un objet
+function createSettings(item,itemCatalogue) {
     const settings = document.createElement("div")
     settings.classList.add("cart__item__content_settings")
 
-    addQuantityToSettings(settings, item)
+    addQuantityToSettings(settings, item,itemCatalogue)
     addDeleteToSettings(settings, item)
     return settings
 }
+
 // Cette fonction permet de supprimer un article dans les paramétres
 function addDeleteToSettings(settings, item) {
     const div = document.createElement("div")
@@ -123,9 +165,10 @@ function addDeleteToSettings(settings, item) {
     div.appendChild(p)
     settings.appendChild(div)
 }
+
 // Fonction de Suppression d'article
 function deleteItem(item) {
-    const itemToDelete = cart.findIndex(
+    const itemToDelete = cartDatas.findIndex(
         (product) => product.id === item.id && product.color === item.color)
     cart.splice(itemToDelete, 1)
     displayTotalPrice()
@@ -134,12 +177,14 @@ function deleteItem(item) {
     deleteArticlePage(item)
 }
 
+// Supprime un article de la page
 function deleteArticlePage(item) {
     const articleToDelete = document.querySelector(
         `article[data-id="${item.id}"][data-color="${item.color}"]`
     )
     articleToDelete.remove()
 }
+
 // Ajoute la quantité au paramétres
 function addQuantityToSettings(settings, item) {
     const quantity = document.createElement("div")
@@ -172,18 +217,20 @@ function updateQuantityAndCost(id, newValue, item) {
 }
 
 
-
+// Supprime les données du cache
 function deleteDataCache(item) {
     const key = `${item.id}-${item.color}`
     localStorage.removeItem(key)
 }
 
+// Sauvegarde les données dans le cache
 function saveDataToCache(item) {
     const dataToSave = JSON.stringify(item)
     const key = `${item.id}-${item.color}`
     localStorage.setItem(key, dataToSave)
 }
 
+// Ajoute une déscription aux produits
 function createDescription(item) {
     const description = document.createElement("div")
     description.classList.add("cart__item__content_description")
@@ -201,11 +248,12 @@ function createDescription(item) {
     return description
 }
 
+// Affiche l'article
 function displayArticle(article) {
     document.querySelector("#cart__items").appendChild(article)
 }
 
-
+// Création d'un article
 function createArticle(item) {
     const article = document.createElement('article')
     article.classList.add("card__item")
@@ -214,17 +262,18 @@ function createArticle(item) {
     return article
 }
 
-
-function createImgDiv(item) {
+// Créé une div qui affiche l'image du produit
+function createImgDiv(itemCatalogue) {
     const div = document.createElement('div')
     div.classList.add("cart__item__img")
     const image = document.createElement('img')
-    image.src = item.imageUrl
-    image.alt = item.altText
+    image.src = itemCatalogue.imageUrl
+    image.alt = itemCatalogue.altText
     div.appendChild(image)
     return div
 }
 
+// Ajout du formulaire
 function submitForm(e) {
     e.preventDefault()
     if (cart.length === 0) {
@@ -252,6 +301,17 @@ function submitForm(e) {
         .catch((err) => console.error(err))
 }
 
+
+// Prévient l'utilisateur d'une alerte avec un message d'erreur indiquant une couleur rouge
+function showAlertError(message) {
+    showAlert(message, '#f44336', 'white');
+}
+// Prévient l'utilisateur d'une alerte avec un message de succés indiquant une couleur verte
+function showAlertSucces(message) {
+    showAlert(message, '#5cb811', 'white');
+}
+
+// Fonction permettant de prévenir l'utilisateur si son email est invalide avec utilisation des regex
 function isEmailInvalid() {
     const email = document.querySelector("#email").value
     const regex = /^[A-Za-z0-9+_.-]+@(.+)$/
@@ -262,6 +322,7 @@ function isEmailInvalid() {
     return false
 }
 
+// Fonction permettant de prévenir l'utilisateur si les données de son formulaire sont invalide
 function isFormInvalid() {
     const form = document.querySelector(".cart__order__form")
     const inputs = form.querySelectorAll("input")
@@ -272,7 +333,6 @@ function isFormInvalid() {
         }
         return false
     })
-
 }
 
 function createReqBody() {
@@ -306,16 +366,41 @@ function getIdCache() {
     return ids
 }
 
-function test() {
-    //déclaration
 
-    //initialisation
 
-    //contrôle
 
-    //traitement
+// Fonction permettant de prévenir l'utilisateur d'un message d'alerte
+function showAlert(message, bgColor, color) {
 
-    //valeur de retour
+    const balises = document.getElementById('cart__items');
+    let divMsg = document.getElementById("message");
+    if (divMsg === null) {
+        divMsg = document.createElement('div');
+        divMsg.id = "message";
+    }
+    divMsg.style.display="block";
+    divMsg.style.color = color;
+    divMsg.style.background = bgColor;
+    divMsg.style.padding="20px";
+    divMsg.style.position="fixed";
+    divMsg.style.top="50px";
+    divMsg.style.left="50px";
+    divMsg.style.zIndex="9999";
+    divMsg.style.borderRadius="20px";
 
+    divMsg.textContent = message;
+    balises.appendChild(divMsg);
+    // Fonction permettant d'afficher l'alerte au bout d'une seconde
+    setTimeout(() => {
+        divMsg.style.display="none";
+    }, 1500)
 }
 
+// Prévient l'utilisateur d'une alerte avec un message d'erreur indiquant une couleur rouge
+function showAlertError(message) {
+    showAlert(message, '#f44336', 'white');
+}
+// Prévient l'utilisateur d'une alerte avec un message de succés indiquant une couleur verte
+function showAlertSucces(message) {
+    showAlert(message, '#5cb811', 'white');
+}
