@@ -1,4 +1,4 @@
-//TODO implémenter les fonctions showAlertError.
+
 function test() {
     //déclaration
 
@@ -8,11 +8,9 @@ function test() {
 
     //traitement
 
-    //valeur de retour
-
-
-    
+    //valeur de retour    
 }
+
 // Récupération des données depuis l'API et ajout des éléments liés au Local Storage vers la page Panier
 let cartDatas;
 let catalogueDatas;
@@ -57,11 +55,26 @@ function getDatasFromBackend(urlBackend) {
         })
 }
 
+
+
 function showCart() {
-    cartDatas.forEach((item) => displayItem(item));
-    //displayTotalQuantity()
-    //displayTotalPrice()
+
+    cartDatas.forEach((item) => {
+
+        catalogueDatas;
+
+        const itemPrice = catalogueDatas.find((catalogueData) => item.id === catalogueData._id).price;
+
+        item.price = itemPrice;
+        displayItem(item);
+
+    });
+
+    displayTotalQuantity();
+    displayTotalPrice();
+
 }
+
 function getItemFromCatalogue(id) {
     let i=0;
     for(i=0; i< catalogueDatas.length;i++) {
@@ -69,6 +82,8 @@ function getItemFromCatalogue(id) {
             return catalogueDatas[i];
         }
     }
+    
+    
 }
 
 
@@ -88,11 +103,11 @@ submitButton.addEventListener("click", (e) => submitForm(e))
 function fetchItemsFromCache() {
     console.log(fetchItemsFromCache);
     // Pour chaque article dans le panier
-    for (let i = 0; i < carDatast.length; i++) {
+    for (let i = 0; i < cartDatast.length; i++) {
         // Faire une demande pour récupérer les données de l'API pour l'article actuel
         fetch(`http://localhost:3000/api/products/${cart[i].id}`)
             .then(response => response.json())
-            .then(apiProduct => {  
+            .then(cartDatas => {  
                 // Afficher l'article
                 displayItem();
             });
@@ -123,24 +138,25 @@ function displayTotalQuantity() {
 function displayTotalPrice() {
     let total = 0
     const totalPrice = document.querySelector("#totalPrice")
-    /*
+    
     cartDatas.forEach((item) => {
         const totalUnitPrice = item.price * item.quantity
         total += totalUnitPrice
         totalPrice.textContent = total
     })
-    */
+    
 }
 
 // Crée le contenu pour un élément dans le panier 
 function createCartContent(item,itemCatalogue) {
     const cardItemContent = document.createElement("div")
     cardItemContent.classList.add("cart__item__content")
-    const description = createDescription(item,itemCatalogue)
+    const description = createDescription(item,itemCatalogue,)
     const settings = createSettings(item, itemCatalogue)
 
     cardItemContent.appendChild(description)
     cardItemContent.appendChild(settings)
+   
     return cardItemContent
 }
 
@@ -175,6 +191,7 @@ function deleteItem(item) {
     displayTotalQuantity()
     deleteDataCache(item)
     deleteArticlePage(item)
+    
 }
 
 // Supprime un article de la page
@@ -205,7 +222,7 @@ function addQuantityToSettings(settings, item) {
 }
 
 
-// fonction permettant de mettre à jour la quantité et le prix global
+// Fonction permettant de mettre à jour la quantité et le prix global
 function updateQuantityAndCost(id, newValue, item) {
     const itemToUpdate = cart.find(item => item.id === id)
     itemToUpdate.quantity = Number(newValue)
