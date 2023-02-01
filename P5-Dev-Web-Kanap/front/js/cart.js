@@ -103,7 +103,7 @@ submitButton.addEventListener("click", (e) => submitForm(e))
 function fetchItemsFromCache() {
     console.log(fetchItemsFromCache);
     // Pour chaque article dans le panier
-    for (let i = 0; i < cartDatast.length; i++) {
+    for (let i = 0; i < cartDatas.length; i++) {
         // Faire une demande pour récupérer les données de l'API pour l'article actuel
         fetch(`http://localhost:3000/api/products/${cart[i].id}`)
             .then(response => response.json())
@@ -151,7 +151,7 @@ function displayTotalPrice() {
 function createCartContent(item,itemCatalogue) {
     const cardItemContent = document.createElement("div")
     cardItemContent.classList.add("cart__item__content")
-    const description = createDescription(item,itemCatalogue,)
+    const description = createDescription(item,itemCatalogue)
     const settings = createSettings(item, itemCatalogue)
 
     cardItemContent.appendChild(description)
@@ -163,7 +163,7 @@ function createCartContent(item,itemCatalogue) {
 // Crée les paramètres d'un objet
 function createSettings(item,itemCatalogue) {
     const settings = document.createElement("div")
-    settings.classList.add("cart__item__content_settings")
+    settings.classList.add("cart__item__content__settings")
 
     addQuantityToSettings(settings, item,itemCatalogue)
     addDeleteToSettings(settings, item)
@@ -171,7 +171,7 @@ function createSettings(item,itemCatalogue) {
 }
 
 // Cette fonction permet de supprimer un article dans les paramétres
-function addDeleteToSettings(settings, item) {
+function addDeleteToSettings(settings, item,) {
     const div = document.createElement("div")
     div.classList.add("cart__item__content__settings__delete")
     div.addEventListener("click", () => deleteItem(item))
@@ -186,7 +186,7 @@ function addDeleteToSettings(settings, item) {
 function deleteItem(item) {
     const itemToDelete = cartDatas.findIndex(
         (product) => product.id === item.id && product.color === item.color)
-    cart.splice(itemToDelete, 1)
+    cartDatas.splice(itemToDelete, 1)
     displayTotalPrice()
     displayTotalQuantity()
     deleteDataCache(item)
@@ -216,21 +216,17 @@ function addQuantityToSettings(settings, item) {
     input.min = "1"
     input.max = "100"
     input.value = item.quantity
-    input.addEventListener("input", () => updateQuantityAndCost(item.id, input.value, item))
-    quantity.appendChild(input)
-    settings.appendChild(quantity)
+    input.addEventListener("input", () => updateQuantityAndCost(input.value, item));
+    quantity.appendChild(input);
+    settings.appendChild(quantity);
 }
 
 
 // Fonction permettant de mettre à jour la quantité et le prix global
-function updateQuantityAndCost(id, newValue, item) {
-    const itemToUpdate = cart.find(item => item.id === id)
-    itemToUpdate.quantity = Number(newValue)
-    item.quantity = itemToUpdate.quantity
-    displayTotalQuantity()
-    displayTotalPrice()
-    deleteDataCache(item)
-    deleteArticlePage(item)
+function updateQuantityAndCost(newValue, item) {
+    item.quantity = (Number(newValue));
+    displayTotalQuantity();
+    displayTotalPrice();
 }
 
 
@@ -247,10 +243,10 @@ function saveDataToCache(item) {
     localStorage.setItem(key, dataToSave)
 }
 
-// Ajoute une déscription aux produits
+// Ajoute une description aux produits
 function createDescription(item) {
     const description = document.createElement("div")
-    description.classList.add("cart__item__content_description")
+    description.classList.add("cart__item__content__description")
 
     const h2 = document.createElement("h2")
     h2.textContent = item.name
@@ -273,7 +269,7 @@ function displayArticle(article) {
 // Création d'un article
 function createArticle(item) {
     const article = document.createElement('article')
-    article.classList.add("card__item")
+    article.classList.add("cart__item")
     article.dataset.id = item.id
     article.dataset.color = item.color
     return article
