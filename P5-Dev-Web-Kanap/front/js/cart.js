@@ -17,7 +17,7 @@ let catalogueDatas;
 
 // Fonction principale qui va vérifier s'il y a des données dans le Local Storage
 function main() {
-    
+    initialisePanier();
     cartDatas = getDatasFromLocalStorage();
     if (cartDatas.length === 0) {
         hideForm();
@@ -28,6 +28,16 @@ function main() {
     getDatasFromBackend(url);
 }
 main();
+
+function initialisePanier() {
+    let items=document.getElementById('cart__items');
+    items.innerHTML="";
+     items=document.getElementById('totalQuantity');
+    items.innerHTML="";
+     items=document.getElementById('totalPrice');
+    items.innerHTML="";
+   
+}
 
 // Fonction pour masquer le formulaire si le panier est vide
 function hideForm() {
@@ -55,8 +65,6 @@ function getDatasFromBackend(urlBackend) {
         })
 }
 
-
-
 function showCart() {
 
     cartDatas.forEach((item) => {
@@ -76,16 +84,13 @@ function showCart() {
 }
 
 function getItemFromCatalogue(id) {
-    let i=0;
-    for(i=0; i< catalogueDatas.length;i++) {
+    let i = 0;
+    for (i = 0; i < catalogueDatas.length; i++) {
         if (catalogueDatas[i]._id === id) {
             return catalogueDatas[i];
         }
     }
-    
-    
 }
-
 
 // Récupération des données via le Local Storage
 function getDatasFromLocalStorage() {
@@ -94,34 +99,18 @@ function getDatasFromLocalStorage() {
 }
 
 /*
-fetchItemsFromCache()
 const submitButton = document.querySelector("#order")
 submitButton.addEventListener("click", (e) => submitForm(e))
 */
 
-// Cette fonction récupère les articles du cache
-function fetchItemsFromCache() {
-    console.log(fetchItemsFromCache);
-    // Pour chaque article dans le panier
-    for (let i = 0; i < cartDatas.length; i++) {
-        // Faire une demande pour récupérer les données de l'API pour l'article actuel
-        fetch(`http://localhost:3000/api/products/${cart[i].id}`)
-            .then(response => response.json())
-            .then(cartDatas => {  
-                // Afficher l'article
-                displayItem();
-            });
-    }
-}
-
 // Affichage des produits
 function displayItem(item) {
-    let itemCatalogue= getItemFromCatalogue(item.id);
-    const article = createArticle(item,itemCatalogue)
+    let itemCatalogue = getItemFromCatalogue(item.id);
+    const article = createArticle(item, itemCatalogue)
     const imageDiv = createImgDiv(itemCatalogue)
     article.appendChild(imageDiv)
 
-    const cardItemContent = createCartContent(item,itemCatalogue)
+    const cardItemContent = createCartContent(item, itemCatalogue)
     article.appendChild(cardItemContent)
     displayArticle(article)
 
@@ -138,44 +127,42 @@ function displayTotalQuantity() {
 function displayTotalPrice() {
     let total = 0
     const totalPrice = document.querySelector("#totalPrice")
-    
+
     cartDatas.forEach((item) => {
         const totalUnitPrice = item.price * item.quantity
         total += totalUnitPrice
         totalPrice.textContent = total
     })
-    
 }
 
 // Crée le contenu pour un élément dans le panier 
-function createCartContent(item,itemCatalogue) {
+function createCartContent(item, itemCatalogue) {
     const cardItemContent = document.createElement("div")
     cardItemContent.classList.add("cart__item__content")
-    const description = createDescription(item,itemCatalogue)
+    const description = createDescription(item, itemCatalogue)
     const settings = createSettings(item, itemCatalogue)
 
     cardItemContent.appendChild(description)
     cardItemContent.appendChild(settings)
-   
+
     return cardItemContent
 }
 
 // Crée les paramètres d'un objet
-function createSettings(item,itemCatalogue) {
+function createSettings(item, itemCatalogue) {
     const settings = document.createElement("div")
     settings.classList.add("cart__item__content__settings")
 
-    addQuantityToSettings(settings, item,itemCatalogue)
+    addQuantityToSettings(settings, item, itemCatalogue)
     addDeleteToSettings(settings, item)
     return settings
 }
 
 // Cette fonction permet de supprimer un article dans les paramétres
-function addDeleteToSettings(settings, item,) {
+function addDeleteToSettings(settings, item) {
     const div = document.createElement("div")
     div.classList.add("cart__item__content__settings__delete")
     div.addEventListener("click", () => deleteItem(item))
-
     const p = document.createElement("p")
     p.textContent = "Supprimer"
     div.appendChild(p)
@@ -186,16 +173,37 @@ function addDeleteToSettings(settings, item,) {
 function deleteItem(item) {
     const itemToDelete = cartDatas.findIndex(
         (product) => product.id === item.id && product.color === item.color)
-    cartDatas.splice(itemToDelete, 1)
-    displayTotalPrice()
+    cartDatas.splice(itemToDelete, 1);
+    localStorage.setItem("datas", JSON.stringify(cartDatas));
+    main();
+    showAlertSucces('Le canapé a bien été supprimé du panier');
+    /*displayTotalPrice()
     displayTotalQuantity()
     deleteDataCache(item)
-    deleteArticlePage(item)
-    
+    deleteArticlePage(item)*/
 }
+
+/*
+
+
+
+
+function handleDeleteArticle(event) {
+  const clickedButton = event.target;
+  const article = clickedButton.closest("article");
+  const articleColor = article.dataset.color;
+  const articleId = article.dataset.id;
+
+  document.body.insertAdjacentHTML(
+    "afterbegin",
+    `<p>color:  ${articleColor} : id: ${articleId}</p>`
+  );
+   // //submitButton.closest(cart__item)
+} */
 
 // Supprime un article de la page
 function deleteArticlePage(item) {
+
     const articleToDelete = document.querySelector(
         `article[data-id="${item.id}"][data-color="${item.color}"]`
     )
@@ -391,21 +399,21 @@ function showAlert(message, bgColor, color) {
         divMsg = document.createElement('div');
         divMsg.id = "message";
     }
-    divMsg.style.display="block";
+    divMsg.style.display = "block";
     divMsg.style.color = color;
     divMsg.style.background = bgColor;
-    divMsg.style.padding="20px";
-    divMsg.style.position="fixed";
-    divMsg.style.top="50px";
-    divMsg.style.left="50px";
-    divMsg.style.zIndex="9999";
-    divMsg.style.borderRadius="20px";
+    divMsg.style.padding = "20px";
+    divMsg.style.position = "fixed";
+    divMsg.style.top = "50px";
+    divMsg.style.left = "50px";
+    divMsg.style.zIndex = "9999";
+    divMsg.style.borderRadius = "20px";
 
     divMsg.textContent = message;
     balises.appendChild(divMsg);
     // Fonction permettant d'afficher l'alerte au bout d'une seconde
     setTimeout(() => {
-        divMsg.style.display="none";
+        divMsg.style.display = "none";
     }, 1500)
 }
 
