@@ -1,16 +1,3 @@
-
-function test() {
-    //déclaration
-
-    //initialisation
-
-    //contrôle
-
-    //traitement
-
-    //valeur de retour    
-}
-
 // Récupération des données depuis l'API et ajout des éléments liés au Local Storage vers la page Panier
 let cartDatas;
 let catalogueDatas;
@@ -30,13 +17,13 @@ function main() {
 main();
 
 function initialisePanier() {
-    let items=document.getElementById('cart__items');
-    items.innerHTML="";
-     items=document.getElementById('totalQuantity');
-    items.innerHTML="";
-     items=document.getElementById('totalPrice');
-    items.innerHTML="";
-   
+    let items = document.getElementById('cart__items');
+    items.innerHTML = "";
+    items = document.getElementById('totalQuantity');
+    items.innerHTML = "";
+    items = document.getElementById('totalPrice');
+    items.innerHTML = "";
+
 }
 
 // Fonction pour masquer le formulaire si le panier est vide
@@ -51,7 +38,7 @@ function showEmptyCart() {
     showAlertError("Votre panier est vide. Veuillez sélectionner des produits pour continuer.");
 }
 
-// Récupération des données avec la méthode fetch => solution 2
+// Récupération des données avec la méthode fetch
 function getDatasFromBackend(urlBackend) {
     fetch(urlBackend)
         .then((res) => res.json())
@@ -65,6 +52,7 @@ function getDatasFromBackend(urlBackend) {
         })
 }
 
+// Fonction qui montre les produits choisis, le prix et la quantité total
 function showCart() {
 
     cartDatas.forEach((item) => {
@@ -82,7 +70,7 @@ function showCart() {
     displayTotalPrice();
 
 }
-
+// Récupération des produits du catalogue
 function getItemFromCatalogue(id) {
     let i = 0;
     for (i = 0; i < catalogueDatas.length; i++) {
@@ -98,10 +86,10 @@ function getDatasFromLocalStorage() {
     return datas == null ? [] : JSON.parse(datas);
 }
 
-/*
+
 const submitButton = document.querySelector("#order")
-submitButton.addEventListener("click", (e) => submitForm(e))
-*/
+submitButton.addEventListener("click", (e) => handleSubmitForm(e))
+
 
 // Affichage des produits
 function displayItem(item) {
@@ -177,29 +165,9 @@ function deleteItem(item) {
     localStorage.setItem("datas", JSON.stringify(cartDatas));
     main();
     showAlertSucces('Le canapé a bien été supprimé du panier');
-    /*displayTotalPrice()
-    displayTotalQuantity()
-    deleteDataCache(item)
-    deleteArticlePage(item)*/
 }
 
-/*
 
-
-
-
-function handleDeleteArticle(event) {
-  const clickedButton = event.target;
-  const article = clickedButton.closest("article");
-  const articleColor = article.dataset.color;
-  const articleId = article.dataset.id;
-
-  document.body.insertAdjacentHTML(
-    "afterbegin",
-    `<p>color:  ${articleColor} : id: ${articleId}</p>`
-  );
-   // //submitButton.closest(cart__item)
-} */
 
 // Supprime un article de la page
 function deleteArticlePage(item) {
@@ -294,34 +262,155 @@ function createImgDiv(itemCatalogue) {
     return div
 }
 
-// Ajout du formulaire
-function submitForm(e) {
-    e.preventDefault()
-    if (cart.length === 0) {
-        alert("Sélectionner un article à acheter")
-        return
-    }
+// Fonction permettant la gestion des évenements du formulaire
+function addEventToFormField() {
+    const formContent = document.querySelector('.cart__order__form');
+    const userFirstName = document.querySelector('#firstName');
+    const userLastName = document.querySelector('#lastName');
+    const emailContent = document.querySelector('#email');
+    const adressContent = document.querySelector('#adress');
+    const cityContent = document.querySelector('#city');
 
-    if (isFormInvalid()) return
-    if (isEmailInvalid()) return
-
-
-    const body = createReqBody()
-    fetch("http://localhost:3000/api/products/order", {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-            "Content-Type": "application/json"
+    userFirstName.addEventListener(
+        'blur',
+        function () {
+            checkFirstNameField();
         }
-    })
-        .then((res) => res.json())
-        .then((data) => {
-            const orderId = data.orderId
-            window.location.href = "confirmation.html" + "?orderId=" + orderId
-        })
-        .catch((err) => console.error(err))
+    )
+    userLastName.addEventListener(
+        'blur',
+        function () {
+            checkLastNameField();
+        }
+    )
+    emailContent.addEventListener(
+        'blur',
+        function () {
+            checkMail();
+        }
+    )
+    adressContent.addEventListener(
+        'blur',
+        function () {
+            checkIfFieldsEmpty('#adress', '#adressErrorMsg');
+        }
+    )
+    cityContent.addEventListener(
+        'blur',
+        function () {
+            checkIfFieldsEmpty('#city', '#cityErrorMsg');
+        }
+    )
+    formContent.addEventListener(
+        'submit',
+        function (evt) {
+            handleSubmitForm(evt)
+        }
+    )
 }
 
+//  Fonction permettant de vérifier si le champ du prénom est bien valide
+function checkFirstNameField() {
+    const firstNameValidation = /^[A-Za-zÀ-ÿ]+[-\s]{0,1}[A-Za-zÀ-ÿ]+$/;
+    const userName = document.querySelector("#firstName").value;
+    const isValidFirstName = firstNameValidation.test(userName) && userName !== '';
+    let firstNameErrorMessage = document.querySelector("#firstNameErrorMsg");
+    firstNameErrorMessage.textContent = isValidFirstName ? null : "Ce champ est invalide.";
+    firstNameErrorMessage.style.color = "red";
+    return isValidFirstName;
+}
+
+// Fonction permettant de vérifier si le champ du nom de famille est bien valide
+function checkLastNameField() {
+    const lastNameValidation = /^(?:[A-Za-z]+[\s]{0,1})+$/;
+    const userLastName = document.querySelector("#lastName").value;
+    let lastNameErrorMessage = document.querySelector("#lastNameErrorMsg");
+    const isValidLastName = lastNameValidation.test(userLastName) && userLastName !== '';
+    lastNameErrorMessage.textContent = isValidLastName ? null : "Ce champ est invalide";
+    lastNameErrorMessage.style.color = "red";
+    return isValidLastName;
+}
+
+// Fonction permettant de vérifier si le champ email est bien valide
+function checkMail() {
+    const emailValidation = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const emailContent = document.querySelector('#email').value;
+    let emailErrorMessage = document.querySelector('#emailErrorMsg');
+    const isValidMail = emailValidation.test(emailContent) && emailContent !== '';
+    emailErrorMessage.textContent = isValidMail ? null : "Ce champ est invalide";
+    emailErrorMessage.style.color = 'red';
+    return isValidMail;
+}
+
+// Fonction permettant de vérifier si le champ est vide
+function checkIfFieldsEmpty(idContent, idErrMsg) {
+    const errMsg = document.querySelector(idErrMsg);
+    const content = document.querySelector(idContent).value;
+    const fieldIsNotEmpty = content !== '';
+    errMsg.textContent = fieldIsNotEmpty ? null : "Ce champ est invalide";
+    errMsg.style.color = 'red';
+    return fieldIsNotEmpty;
+}
+
+// Fonction permettant de récupérer de façon asynchrone les données du formulaire remplis par l'utilisateur
+async function handleSubmitForm(evt) {
+    evt.preventDefault();
+
+    if (!checkFields()) {
+        return;
+    }
+
+    const requestBody = {
+        contact: {
+            firstName: document.querySelector('#firstName').value,
+            lastName: document.querySelector('#lastName').value,
+            address: document.querySelector('#adress').value,
+            city: document.querySelector('#city').value,
+            email: document.querySelector('#email').value,
+        },
+        products: cartProducts.map((product) => product.id)
+    }
+
+    try {
+        const res = await postOrder(requestBody);
+        clearLocalStorage();
+        window.location.href = 'confirmation.html?order=' + res.orderId;
+    } catch (err) {
+        showAlertError('Une erreur est survenue')
+    }
+}
+
+
+// Fonction permettant de vérifier que le formulaire est bien valide
+function checkFields() {
+    return checkFirstNameField()
+        && checkLastNameField()
+        && checkMail
+        && checkIfFieldsEmpty('#adress', '#addressErrorMsg')
+        && checkIfFieldsEmpty('#city', '#cityErrorMsg')
+}
+
+// Fonction permettant d'envoyer la requête vers l'API de façon asynchrone
+async function postOrder(requestBody) {
+    const response = await fetch(`${URL}/products/order`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(requestBody)
+    });
+    return response.json();
+}
+
+// Fonction permettant de nettoyer le Local Storage une fois la commande effectué
+function clearLocalStorage() {
+    localStorage.clear();
+}
+
+// Fonction permettant d'afficher un message d'erreur si l'API n'est pas disponible.
+function showError() {
+    document.querySelector('.cart').textContent = "Désolé, le site n'est pas disponible"
+}
 
 // Prévient l'utilisateur d'une alerte avec un message d'erreur indiquant une couleur rouge
 function showAlertError(message) {
@@ -332,49 +421,6 @@ function showAlertSucces(message) {
     showAlert(message, '#5cb811', 'white');
 }
 
-// Fonction permettant de prévenir l'utilisateur si son email est invalide avec utilisation des regex
-function isEmailInvalid() {
-    const email = document.querySelector("#email").value
-    const regex = /^[A-Za-z0-9+_.-]+@(.+)$/
-    if (regex.test(email) === false) {
-        alert("Renseignez votre email dans le champs indiquées s'il-vous plaît")
-        return true
-    }
-    return false
-}
-
-// Fonction permettant de prévenir l'utilisateur si les données de son formulaire sont invalide
-function isFormInvalid() {
-    const form = document.querySelector(".cart__order__form")
-    const inputs = form.querySelectorAll("input")
-    inputs.forEach((input) => {
-        if (input.value === "") {
-            alert("Remplissez tous les champs du formulaire s'il-vous plaît")
-            return true
-        }
-        return false
-    })
-}
-
-function createReqBody() {
-    const form = document.querySelector(".cart__order__form")
-    const firstName = form.elements.firstName.value
-    const lastName = form.elements.lastName.value
-    const address = form.elements.address.value
-    const city = form.elements.city.value
-    const email = form.elements.email.value
-    const body = {
-        contact: {
-            firstName: firstName,
-            lastName: lastName,
-            address: address,
-            city: city,
-            email: email
-        },
-        products: getIdCache()
-    }
-    return body
-}
 
 function getIdCache() {
     const numberOfProducts = localStorage.length
