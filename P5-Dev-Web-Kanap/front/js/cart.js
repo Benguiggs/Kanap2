@@ -13,6 +13,9 @@ function main() {
     }
     let url = "http://localhost:3000/api/products";
     getDatasFromBackend(url);
+
+    addEventToButton();
+    addEventToFormField();
 }
 main();
 
@@ -85,10 +88,6 @@ function getDatasFromLocalStorage() {
     let datas = localStorage.getItem('datas');
     return datas == null ? [] : JSON.parse(datas);
 }
-
-
-const submitButton = document.querySelector("#order")
-submitButton.addEventListener("click", (e) => handleSubmitForm(e))
 
 
 // Affichage des produits
@@ -262,21 +261,27 @@ function createImgDiv(itemCatalogue) {
     return div
 }
 
+function addEventToButton() {
+    const submitButton = document.querySelector("#order");
+    submitButton.addEventListener("click", (e)=>addToCart(e));
+}
+
 // Fonction permettant la gestion des évenements du formulaire
 function addEventToFormField() {
     const formContent = document.querySelector('.cart__order__form');
     const userFirstName = document.querySelector('#firstName');
     const userLastName = document.querySelector('#lastName');
     const emailContent = document.querySelector('#email');
-    const adressContent = document.querySelector('#adress');
+    const addressContent = document.querySelector('#address');
     const cityContent = document.querySelector('#city');
 
     userFirstName.addEventListener(
         'blur',
-        function () {
+        function() {
             checkFirstNameField();
         }
-    )
+         
+        )
     userLastName.addEventListener(
         'blur',
         function () {
@@ -289,22 +294,16 @@ function addEventToFormField() {
             checkMail();
         }
     )
-    adressContent.addEventListener(
+    addressContent.addEventListener(
         'blur',
         function () {
-            checkIfFieldsEmpty('#adress', '#adressErrorMsg');
+            checkIfFieldsEmpty('#address', '#addressErrorMsg');
         }
     )
     cityContent.addEventListener(
         'blur',
         function () {
             checkIfFieldsEmpty('#city', '#cityErrorMsg');
-        }
-    )
-    formContent.addEventListener(
-        'submit',
-        function (evt) {
-            handleSubmitForm(evt)
         }
     )
 }
@@ -353,28 +352,28 @@ function checkIfFieldsEmpty(idContent, idErrMsg) {
 }
 
 // Fonction permettant de récupérer de façon asynchrone les données du formulaire remplis par l'utilisateur
-async function handleSubmitForm(evt) {
+async function addToCart(evt) {
     evt.preventDefault();
 
     if (!checkFields()) {
         return;
     }
-
     const requestBody = {
         contact: {
             firstName: document.querySelector('#firstName').value,
             lastName: document.querySelector('#lastName').value,
-            address: document.querySelector('#adress').value,
+            address: document.querySelector('#address').value,
             city: document.querySelector('#city').value,
             email: document.querySelector('#email').value,
         },
-        products: cartProducts.map((product) => product.id)
+        products: cartDatas.map((product) => product.id)
     }
 
     try {
-        const res = await postOrder(requestBody);
-        clearLocalStorage();
-        window.location.href = 'confirmation.html?order=' + res.orderId;
+        console.log(requestBody);
+        postOrder(requestBody);
+        //clearLocalStorage();
+       
     } catch (err) {
         showAlertError('Une erreur est survenue')
     }
@@ -385,21 +384,27 @@ async function handleSubmitForm(evt) {
 function checkFields() {
     return checkFirstNameField()
         && checkLastNameField()
-        && checkMail
-        && checkIfFieldsEmpty('#adress', '#addressErrorMsg')
+        && checkMail()
+        && checkIfFieldsEmpty('#address', '#addressErrorMsg')
         && checkIfFieldsEmpty('#city', '#cityErrorMsg')
 }
 
 // Fonction permettant d'envoyer la requête vers l'API de façon asynchrone
 async function postOrder(requestBody) {
-    const response = await fetch(`${URL}/products/order`, {
+     fetch(`http://localhost:3000/api/products/order`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
         },
         body: JSON.stringify(requestBody)
+    })
+    .then((res)=> res.json())
+    .then((confirmation)=> {
+        console.log(confirmation);
+        localStorage.clear() ;
+        window.location.href = 'confirmation.html?order=' + confirmation.orderId;
     });
-    return response.json();
+    
 }
 
 // Fonction permettant de nettoyer le Local Storage une fois la commande effectué

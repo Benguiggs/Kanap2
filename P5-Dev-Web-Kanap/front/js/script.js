@@ -9,8 +9,8 @@ function getDatasFromBackend(urlBackend) {
         .then((res) => res.json())
         .then((datas) => showProducts(datas))
         .catch((e) => {
-            console.log(e)
-            (showAlertError)
+            console.log(e);
+            showAlertError('Une erreur est survenue, merci de revenir plus tard');
             document.getElementById().innerHTML = error.message
         })
 }
@@ -33,6 +33,7 @@ function showProducts(datas) {
 }
 //Affiche un produit
 function showData(data) {
+    
     const { _id, imageUrl, altTxt, name, description } = data
     const attach = createAttach(_id)
     const article = document.createElement("article")
