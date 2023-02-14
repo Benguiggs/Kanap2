@@ -18,7 +18,7 @@ function main() {
     addEventToFormField();
 }
 main();
-
+// Fonction qui va permettre d'initialiser le panier
 function initialisePanier() {
     let items = document.getElementById('cart__items');
     items.innerHTML = "";
@@ -66,7 +66,6 @@ function showCart() {
 
         item.price = itemPrice;
         displayItem(item);
-
     });
 
     displayTotalQuantity();
@@ -89,7 +88,6 @@ function getDatasFromLocalStorage() {
     return datas == null ? [] : JSON.parse(datas);
 }
 
-
 // Affichage des produits
 function displayItem(item) {
     let itemCatalogue = getItemFromCatalogue(item.id);
@@ -100,7 +98,6 @@ function displayItem(item) {
     const cardItemContent = createCartContent(item, itemCatalogue)
     article.appendChild(cardItemContent)
     displayArticle(article)
-
 }
 
 // Affiche la quantité totale des produits
@@ -261,14 +258,14 @@ function createImgDiv(itemCatalogue) {
     return div
 }
 
+// Ajoute un événement au bouton 
 function addEventToButton() {
     const submitButton = document.querySelector("#order");
-    submitButton.addEventListener("click", (e)=>addToCart(e));
+    submitButton.addEventListener("click", (e) => addToCart(e));
 }
 
 // Fonction permettant la gestion des évenements du formulaire
 function addEventToFormField() {
-    const formContent = document.querySelector('.cart__order__form');
     const userFirstName = document.querySelector('#firstName');
     const userLastName = document.querySelector('#lastName');
     const emailContent = document.querySelector('#email');
@@ -277,11 +274,10 @@ function addEventToFormField() {
 
     userFirstName.addEventListener(
         'blur',
-        function() {
+        function () {
             checkFirstNameField();
         }
-         
-        )
+    )
     userLastName.addEventListener(
         'blur',
         function () {
@@ -373,7 +369,7 @@ async function addToCart(evt) {
         console.log(requestBody);
         postOrder(requestBody);
         //clearLocalStorage();
-       
+
     } catch (err) {
         showAlertError('Une erreur est survenue')
     }
@@ -391,20 +387,19 @@ function checkFields() {
 
 // Fonction permettant d'envoyer la requête vers l'API de façon asynchrone
 async function postOrder(requestBody) {
-     fetch(`http://localhost:3000/api/products/order`, {
+    fetch(`http://localhost:3000/api/products/order`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
         },
         body: JSON.stringify(requestBody)
     })
-    .then((res)=> res.json())
-    .then((confirmation)=> {
-        console.log(confirmation);
-        localStorage.clear() ;
-        window.location.href = 'confirmation.html?order=' + confirmation.orderId;
-    });
-    
+        .then((res) => res.json())
+        .then((confirmation) => {
+            console.log(confirmation);
+            localStorage.clear();
+            window.location.href = 'confirmation.html?order=' + confirmation.orderId;
+        });
 }
 
 // Fonction permettant de nettoyer le Local Storage une fois la commande effectué
@@ -426,7 +421,7 @@ function showAlertSucces(message) {
     showAlert(message, '#5cb811', 'white');
 }
 
-
+// récupere l'id depuis le cache
 function getIdCache() {
     const numberOfProducts = localStorage.length
     const ids = []
@@ -437,8 +432,6 @@ function getIdCache() {
     }
     return ids
 }
-
-
 
 
 // Fonction permettant de prévenir l'utilisateur d'un message d'alerte

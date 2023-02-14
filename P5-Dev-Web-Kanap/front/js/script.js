@@ -1,8 +1,5 @@
 main();
 
-//TODO implémenter les fonctions showAlertError..
-
-
 // Récupération des données avec la méthode fetch
 function getDatasFromBackend(urlBackend) {
     fetch(urlBackend)
@@ -33,7 +30,7 @@ function showProducts(datas) {
 }
 //Affiche un produit
 function showData(data) {
-    
+
     const { _id, imageUrl, altTxt, name, description } = data
     const attach = createAttach(_id)
     const article = document.createElement("article")
@@ -51,7 +48,6 @@ function appendElementsToArticle(article, array) {
     })
 }
 
-
 // Fonction qui permet de faire le lien avec la page product
 function createAttach(id) {
     const attach = document.createElement("a")
@@ -59,6 +55,8 @@ function createAttach(id) {
     return attach
 }
 
+
+// Ajouter un article et l'attache avec le lien de la page product
 function appendArticletoAttach(attach, article) {
     const items = document.querySelector("#items")
     if (items != null) {

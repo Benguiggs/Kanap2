@@ -9,14 +9,14 @@ function getOrderIdFromUrl() {
         return id;
     } else {
         return false;
-    }    
+    }
 }
 
 
 
 function displayOrderId(orderId) {
     const orderIdElement = document.getElementById("orderId")
-    orderIdElement.textContent = orderId ;
+    orderIdElement.textContent = orderId;
 
 }
 

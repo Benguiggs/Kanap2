@@ -20,7 +20,7 @@ function getDataFromBackend(url, id) {
         .then((response) => displayProduct(response))
         .catch((e) => {
             console.log(e)
-            //TODO masquer le zone de détail du produit
+
             showAlertError('Produit non trouvé');
 
             document.getElementById().innerHTML = error.message
@@ -141,7 +141,7 @@ function isOrdernotvalid(color, quantity) {
     }
 }
 
-
+// Utilisation de la méthode S.O.L.I.D
 function main() {
     let url = "http://localhost:3000/api/products/";
     let id = getIdFromUrl();
