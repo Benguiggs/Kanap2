@@ -64,7 +64,7 @@ function showCart() {
 
         const itemPrice = catalogueDatas.find((catalogueData) => item.id === catalogueData._id).price;
 
-        item.price = itemPrice;
+       item.price = itemPrice;
         displayItem(item);
     });
 
@@ -155,12 +155,19 @@ function addDeleteToSettings(settings, item) {
 
 // Fonction de Suppression d'article
 function deleteItem(item) {
-    const itemToDelete = cartDatas.findIndex(
-        (product) => product.id === item.id && product.color === item.color)
+    const itemToDelete = cartDatas.findIndex((product) => product.id === item.id && product.color === item.color);
     cartDatas.splice(itemToDelete, 1);
-    localStorage.setItem("datas", JSON.stringify(cartDatas));
+    const cartDataStorage = removePriceFromProducts(cartDatas);
+    localStorage.setItem("datas", JSON.stringify(cartDataStorage));
     main();
     showAlertSucces('Le canapé a bien été supprimé du panier');
+}
+
+function removePriceFromProducts(products) {
+    return products.map((product) => {
+        const { price, ...dataWithoutPrice } = product;
+        return dataWithoutPrice;
+    });
 }
 
 
@@ -208,12 +215,12 @@ function deleteDataCache(item) {
     localStorage.removeItem(key)
 }
 
-// Sauvegarde les données dans le cache
+/* Sauvegarde les données dans le cache
 function saveDataToCache(item) {
     const dataToSave = JSON.stringify(item)
     const key = `${item.id}-${item.color}`
     localStorage.setItem(key, dataToSave)
-}
+}*/
 
 // Ajoute une description aux produits
 function createDescription(item) {
