@@ -201,9 +201,10 @@ function addQuantityToSettings(settings, item) {
 }
 
 
-// Fonction permettant de mettre à jour la quantité et le prix global
 function updateQuantityAndCost(newValue, item) {
     item.quantity = (Number(newValue));
+    const cartDataStorage = removePriceFromProducts(cartDatas);
+    localStorage.setItem("datas", JSON.stringify(cartDataStorage));
     displayTotalQuantity();
     displayTotalPrice();
 }
@@ -215,12 +216,6 @@ function deleteDataCache(item) {
     localStorage.removeItem(key)
 }
 
-/* Sauvegarde les données dans le cache
-function saveDataToCache(item) {
-    const dataToSave = JSON.stringify(item)
-    const key = `${item.id}-${item.color}`
-    localStorage.setItem(key, dataToSave)
-}*/
 
 // Ajoute une description aux produits
 function createDescription(item) {
